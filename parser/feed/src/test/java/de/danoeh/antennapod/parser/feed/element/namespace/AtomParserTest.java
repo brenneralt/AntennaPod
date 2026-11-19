@@ -84,6 +84,22 @@ public class AtomParserTest {
     }
 
     @Test
+    public void testYoutubeMediaContent() throws Exception {
+        File feedFile = FeedParserTestHelper.getFeedFile("feed-atom-testYoutubeMediaContent.xml");
+        Feed feed = FeedParserTestHelper.runFeedParser(feedFile);
+        assertEquals(Feed.TYPE_ATOM1, feed.getType());
+        assertEquals(1, feed.getItems().size());
+
+        FeedItem item = feed.getItems().get(0);
+        assertEquals("yt:video:yN-yZ7-PJVk", item.getItemIdentifier());
+        assertTrue(item.hasMedia());
+        FeedMedia media = item.getMedia();
+        //noinspection ConstantConditions
+        assertEquals("https://www.youtube.com/v/yN-yZ7-PJVk?version=3", media.getDownloadUrl());
+        assertEquals("audio/*", media.getMimeType());
+    }
+
+    @Test
     public void testLogoWithWhitespace() throws Exception {
         File feedFile = FeedParserTestHelper.getFeedFile("feed-atom-testLogoWithWhitespace.xml");
         Feed feed = FeedParserTestHelper.runFeedParser(feedFile);

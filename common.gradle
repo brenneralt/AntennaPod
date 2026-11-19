@@ -39,6 +39,7 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_21
         targetCompatibility JavaVersion.VERSION_21
+        coreLibraryDesugaringEnabled true
     }
 
     tasks.withType(JavaCompile) {
@@ -81,6 +82,7 @@ dependencies {
     // align all versions of kotlin transitive dependencies, see
     // https://youtrack.jetbrains.com/issue/KT-55297/kotlin-stdlib-should-declare-constraints-on-kotlin-stdlib-jdk8-and-kotlin-stdlib-jdk7
     implementation platform(libs.kotlin.bom)
+    coreLibraryDesugaring libs.desugar.jdk.libs.nio
 }
 
 tasks.withType(Test).configureEach {

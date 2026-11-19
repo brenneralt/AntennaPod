@@ -34,6 +34,7 @@ import de.danoeh.antennapod.model.feed.FeedMedia;
 import de.danoeh.antennapod.parser.feed.util.DateUtils;
 import de.danoeh.antennapod.model.download.DownloadError;
 import de.danoeh.antennapod.net.common.UriUtil;
+import de.danoeh.antennapod.net.common.youtube.YouTubeStreamResolver;
 import okhttp3.OkHttpClient;
 import okhttp3.Protocol;
 import okhttp3.Request;
@@ -58,7 +59,11 @@ public class HttpDownloader extends Downloader {
         ResponseBody responseBody = null;
 
         try {
-            final URI uri = UriUtil.getURIFromRequestUrl(request.getSource());
+            String sourceUrl = request.getSource();
+            if (YouTubeStreamResolver.isYouTubeMediaUrl(sourceUrl)) {
+                sourceUrl = YouTubeStreamResolver.resolve(sourceUrl);
+            }
+            final URI uri = UriUtil.getURIFromRequestUrl(sourceUrl);
             Request.Builder httpReq = new Request.Builder().url(uri.toURL());
             httpReq.tag(request);
             httpReq.cacheControl(new CacheControl.Builder().noStore().build());

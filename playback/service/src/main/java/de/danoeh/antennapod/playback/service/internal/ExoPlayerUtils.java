@@ -30,6 +30,7 @@ import androidx.media3.extractor.DefaultExtractorsFactory;
 import androidx.media3.extractor.mp3.Mp3Extractor;
 import de.danoeh.antennapod.net.common.NetworkUtils;
 import de.danoeh.antennapod.net.common.UserAgentInterceptor;
+import de.danoeh.antennapod.net.common.youtube.YouTubeStreamResolver;
 import de.danoeh.antennapod.playback.base.MediaItemAdapter;
 import de.danoeh.antennapod.playback.service.R;
 import de.danoeh.antennapod.storage.preferences.UserPreferences;
@@ -166,6 +167,9 @@ public class ExoPlayerUtils {
                 String originalUrl = dataSpec.uri.toString();
                 if (!originalUrl.startsWith("http")) {
                     return dataSpec;
+                }
+                if (YouTubeStreamResolver.isYouTubeMediaUrl(originalUrl)) {
+                    return dataSpec.withUri(Uri.parse(YouTubeStreamResolver.resolve(originalUrl)));
                 }
                 String resolvedUrl = redirectCache.get(originalUrl);
                 if (resolvedUrl == null) {
