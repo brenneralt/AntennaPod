@@ -82,9 +82,7 @@ e cria `FeedMedia(downloadUrl=<URL /v/>, mimeType=audio/*)`. A URL não é mídi
   Ambos os comportamentos são do emulador, não do código.
 
 ## Próximo
-- Commit na branch `feature/youtube-playback` (`8b6a7ce4d`).
-- Build release (R8) nunca executado neste branch — regras Rhino do `app/proguard.cfg`
-  ainda não verificadas em build com minify.
+- Commits na branch `feature/youtube-playback` (`8b6a7ce4d`, `6837f1894`).
 
 ## Auditoria pós-commit (encontrado e corrigido)
 1. **User-Agent sobrescrito:** `AntennapodHttpClient` aplica `UserAgentInterceptor`
@@ -95,7 +93,14 @@ e cria `FeedMedia(downloadUrl=<URL /v/>, mimeType=audio/*)`. A URL não é mídi
    1.15.1 (compilava contra 1.15.1 e rodava com 1.24.1). `libs.versions.toml` atualizado
    para 1.24.1; `:app:assembleDebug`, `checkstyle lint` e testes de `:net:common`,
    `:parser:feed`, `:parser:transcript` e `ShownotesCleanerTest` passam.
-3. **Sem impacto (não corrigido):** `MediaSizeLoader` faz HEAD na URL `/v/`; o YouTube
+3. **Build release (R8) quebrava:** Rhino referenciava `javax.script.*` (via
+   `rhino-engine`, morto no Android), `java.beans.*` e `jdk.dynalink.*` — classes JDK
+   inexistentes no Android → "Missing classes detected while running R8". Corrigido:
+   exclusão de `org.mozilla:rhino-engine` em `:net:common` + `-dontwarn` do que sobra
+   (núcleo do Rhino). `:app:minifyFreeReleaseWithR8` agora passa; a build release
+   completa só falha em `validateSigningFreeRelease` (keystore não commitado —
+   esperado). `:app:assembleDebug` e `checkstyle lint` re-executados com sucesso.
+4. **Sem impacto (não corrigido):** `MediaSizeLoader` faz HEAD na URL `/v/`; o YouTube
    responde 200 com `Content-Length: 0`, resultando em `checkedOnSizeButUnknown`
    (tamanho exibido como desconhecido). Comportamento pré-existente do app; só um
    request extra por episódio do YouTube.

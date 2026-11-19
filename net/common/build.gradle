@@ -20,7 +20,9 @@ dependencies {
     annotationProcessor libs.androidx.annotation
     implementation libs.okhttp
     implementation libs.okhttp.urlconnection
-    implementation libs.newpipeextractor
+    implementation(libs.newpipeextractor) {
+        exclude group: 'org.mozilla', module: 'rhino-engine'
+    }
 
     testImplementation libs.junit
     testImplementation libs.robolectric
