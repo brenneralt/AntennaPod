@@ -60,7 +60,7 @@ kotlin-bom = { module = "org.jetbrains.kotlin:kotlin-bom", version = "1.9.24" }
 kotlinx-coroutines-play-services = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-play-services", version = "1.9.0" }
 commons-lang3 = { module = "org.apache.commons:commons-lang3", version = "3.18.0" }
 commons-io = { module = "commons-io:commons-io", version = "2.5" }
-jsoup = { module = "org.jsoup:jsoup", version = "1.15.1" }
+jsoup = { module = "org.jsoup:jsoup", version = "1.24.1" }
 newpipeextractor = { module = "com.github.TeamNewPipe:NewPipeExtractor", version.ref = "newpipeextractor" }
 desugar-jdk-libs-nio = { module = "com.android.tools:desugar_jdk_libs_nio", version.ref = "desugarJdkLibs" }
 glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }

@@ -82,4 +82,20 @@ e cria `FeedMedia(downloadUrl=<URL /v/>, mimeType=audio/*)`. A URL não é mídi
   Ambos os comportamentos são do emulador, não do código.
 
 ## Próximo
-- Commit na branch `feature/youtube-playback` (nada commitado ainda).
+- Commit na branch `feature/youtube-playback` (`8b6a7ce4d`).
+- Build release (R8) nunca executado neste branch — regras Rhino do `app/proguard.cfg`
+  ainda não verificadas em build com minify.
+
+## Auditoria pós-commit (encontrado e corrigido)
+1. **User-Agent sobrescrito:** `AntennapodHttpClient` aplica `UserAgentInterceptor`
+   (AntennaPod/0.0.0) depois do nosso `addHeader`, então as requisições do extractor
+   saíam como `AntennaPod/0.0.0` em vez de Firefox ESR. Corrigido: `ExtractorDownloader`
+   agora usa `newBuilder()` com interceptor próprio que re-aplica o UA após o global.
+2. **jsoup divergente:** NewPipeExtractor puxa jsoup 1.24.1, mas o projeto declarava
+   1.15.1 (compilava contra 1.15.1 e rodava com 1.24.1). `libs.versions.toml` atualizado
+   para 1.24.1; `:app:assembleDebug`, `checkstyle lint` e testes de `:net:common`,
+   `:parser:feed`, `:parser:transcript` e `ShownotesCleanerTest` passam.
+3. **Sem impacto (não corrigido):** `MediaSizeLoader` faz HEAD na URL `/v/`; o YouTube
+   responde 200 com `Content-Length: 0`, resultando em `checkedOnSizeButUnknown`
+   (tamanho exibido como desconhecido). Comportamento pré-existente do app; só um
+   request extra por episódio do YouTube.

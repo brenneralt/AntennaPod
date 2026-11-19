@@ -164,7 +164,11 @@ public final class YouTubeStreamResolver {
                     builder.addHeader(header.getKey(), value);
                 }
             }
-            try (var response = AntennapodHttpClient.getHttpClient()
+            try (var response = AntennapodHttpClient.getHttpClient().newBuilder()
+                    .addInterceptor(chain -> chain.proceed(chain.request().newBuilder()
+                            .header("User-Agent", USER_AGENT)
+                            .build()))
+                    .build()
                     .newCall(builder.build()).execute()) {
                 if (response.code() == 429) {
                     throw new ReCaptchaException("reCaptcha Challenge requested", url);
