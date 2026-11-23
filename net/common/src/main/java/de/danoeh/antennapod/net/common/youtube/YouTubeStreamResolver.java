@@ -14,6 +14,7 @@ import org.schabi.newpipe.extractor.downloader.Response;
 import org.schabi.newpipe.extractor.exceptions.ExtractionException;
 import org.schabi.newpipe.extractor.exceptions.ReCaptchaException;
 import org.schabi.newpipe.extractor.stream.AudioStream;
+import org.schabi.newpipe.extractor.stream.AudioTrackType;
 import org.schabi.newpipe.extractor.stream.DeliveryMethod;
 import org.schabi.newpipe.extractor.stream.StreamExtractor;
 
@@ -95,12 +96,13 @@ public final class YouTubeStreamResolver {
         }
     }
 
-    private static AudioStream selectBestAudioStream(List<AudioStream> streams) {
+    static AudioStream selectBestAudioStream(List<AudioStream> streams) {
         if (streams == null) {
             return null;
         }
         AudioStream best = null;
         boolean bestIsMp4 = false;
+        int bestRank = 0;
         for (AudioStream stream : streams) {
             if (stream.getDeliveryMethod() != DeliveryMethod.PROGRESSIVE_HTTP) {
                 continue;
@@ -111,16 +113,30 @@ public final class YouTubeStreamResolver {
             }
             boolean isMp4 = stream.getFormat() != null
                     && AUDIO_MP4.equals(stream.getFormat().mimeType);
+            int rank = audioTrackRank(stream);
             boolean better = best == null
-                    || (isMp4 && !bestIsMp4)
-                    || (isMp4 == bestIsMp4
+                    || rank < bestRank
+                    || (rank == bestRank && isMp4 && !bestIsMp4)
+                    || (rank == bestRank && isMp4 == bestIsMp4
                     && stream.getAverageBitrate() > best.getAverageBitrate());
             if (better) {
                 best = stream;
                 bestIsMp4 = isMp4;
+                bestRank = rank;
             }
         }
         return best;
+    }
+
+    private static int audioTrackRank(AudioStream stream) {
+        if (stream.getAudioTrackType() == AudioTrackType.ORIGINAL) {
+            return 0;
+        }
+        Locale locale = stream.getAudioLocale();
+        if (locale != null && "pt".equals(locale.getLanguage())) {
+            return 1;
+        }
+        return 2;
     }
 
     private static void evictExpired(long now) {
