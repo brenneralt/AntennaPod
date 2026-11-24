@@ -1,5 +1,6 @@
 package de.danoeh.antennapod.net.discovery;
 
+import de.danoeh.antennapod.net.common.youtube.YouTubeFeedUrl;
 import io.reactivex.rxjava3.core.Single;
 
 import java.util.ArrayList;
@@ -23,6 +24,9 @@ public class PodcastSearcherRegistry {
     }
 
     public static Single<String> lookupUrl(String url) {
+        if (YouTubeFeedUrl.needsLookup(url)) {
+            return Single.fromCallable(() -> YouTubeFeedUrl.resolve(url));
+        }
         for (PodcastSearcherRegistry.SearcherInfo searchProviderInfo : getSearchProviders()) {
             if (searchProviderInfo.searcher.getClass() != CombinedSearcher.class
                     && searchProviderInfo.searcher.urlNeedsLookup(url)) {
@@ -33,6 +37,9 @@ public class PodcastSearcherRegistry {
     }
 
     public static boolean urlNeedsLookup(String url) {
+        if (YouTubeFeedUrl.needsLookup(url)) {
+            return true;
+        }
         for (PodcastSearcherRegistry.SearcherInfo searchProviderInfo : getSearchProviders()) {
             if (searchProviderInfo.searcher.getClass() != CombinedSearcher.class
                     && searchProviderInfo.searcher.urlNeedsLookup(url)) {

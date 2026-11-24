@@ -39,6 +39,7 @@ import de.danoeh.antennapod.model.feed.FeedItem;
 import de.danoeh.antennapod.model.feed.FeedItemFilter;
 import de.danoeh.antennapod.ui.episodeslist.FeedItemMenuHandler;
 import de.danoeh.antennapod.net.discovery.CombinedSearcher;
+import de.danoeh.antennapod.net.common.youtube.YouTubeFeedUrl;
 import de.danoeh.antennapod.storage.database.DBReader;
 import de.danoeh.antennapod.ui.appstartintent.OnlineFeedviewActivityStarter;
 import de.danoeh.antennapod.ui.discovery.OnlineSearchFragment;
@@ -477,6 +478,11 @@ public class SearchFragment extends Fragment implements EpisodeItemListAdapter.O
         String query = searchView.getQuery().toString();
         if (query.matches("http[s]?://.*")) {
             startActivity(new OnlineFeedviewActivityStarter(getContext(), query).getIntent());
+            return;
+        }
+        String youtubeFeedUrl = YouTubeFeedUrl.fromUserInput(query);
+        if (youtubeFeedUrl != null) {
+            startActivity(new OnlineFeedviewActivityStarter(getContext(), youtubeFeedUrl).getIntent());
             return;
         }
         ((MainActivity) getActivity()).loadChildFragment(

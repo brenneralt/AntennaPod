@@ -104,3 +104,16 @@ e cria `FeedMedia(downloadUrl=<URL /v/>, mimeType=audio/*)`. A URL não é mídi
    responde 200 com `Content-Length: 0`, resultando em `checkedOnSizeButUnknown`
    (tamanho exibido como desconhecido). Comportamento pré-existente do app; só um
    request extra por episódio do YouTube.
+
+## Conversão automática de URL do YouTube em URL de feed
+- Nova classe `net/common/.../youtube/YouTubeFeedUrl`: `fromUserInput()` normaliza entrada
+  (`@handle`, URL sem esquema), `needsLookup()` decide se há conversão pendente,
+  `resolve()` converte (`list=PL…` → `playlist_id`, `list=UU`+22 → `channel_id`,
+  `/channel/UC…` → `channel_id`; páginas `@handle`/`/c/`/`/user/` → busca do
+  `<link rel="canonical">` para obter o `channel_id`).
+- Ponto central: `PodcastSearcherRegistry.lookupUrl()`/`urlNeedsLookup()` chamam a
+  conversão (usado por `OnlineFeedViewActivity`); `AddFeedFragment.performSearch`,
+  diálogo de URL manual e `SearchFragment.searchOnline` também normalizam a entrada.
+- `YouTubeFeedUrlTest` (11 testes) passa em `:net:common:test`; `:app:assembleDebug`,
+  `checkstyle lint` BUILD SUCCESSFUL.
+- Pendente: verificação e2e no aparelho (aparelho desconectado no momento).

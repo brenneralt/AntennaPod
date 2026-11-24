@@ -34,6 +34,7 @@ import de.danoeh.antennapod.activity.OpmlImportActivity;
 import de.danoeh.antennapod.event.MessageEvent;
 import de.danoeh.antennapod.model.feed.Feed;
 import de.danoeh.antennapod.net.common.UrlChecker;
+import de.danoeh.antennapod.net.common.youtube.YouTubeFeedUrl;
 import de.danoeh.antennapod.net.download.serviceinterface.FeedUpdateManager;
 import de.danoeh.antennapod.storage.database.FeedDatabaseWriter;
 import de.danoeh.antennapod.model.feed.SortOrder;
@@ -185,11 +186,15 @@ public class AddFeedFragment extends Fragment {
 
         alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener((view) -> {
             Editable inputText = dialogBinding.textInput.getText();
-            if (!UrlChecker.isValidUrl(inputText.toString())) {
+            String url = YouTubeFeedUrl.fromUserInput(inputText.toString());
+            if (url == null) {
+                url = inputText.toString();
+            }
+            if (!UrlChecker.isValidUrl(url)) {
                 dialogBinding.textInputLayout.setError(getText(R.string.rss_address_invalid));
                 return;
             }
-            addUrl(inputText.toString());
+            addUrl(url);
             alertDialog.dismiss();
         });
     }
@@ -204,6 +209,11 @@ public class AddFeedFragment extends Fragment {
         String query = viewBinding.combinedFeedSearchEditText.getText().toString();
         if (query.matches("http[s]?://.*")) {
             addUrl(query);
+            return;
+        }
+        String youtubeFeedUrl = YouTubeFeedUrl.fromUserInput(query);
+        if (youtubeFeedUrl != null) {
+            addUrl(youtubeFeedUrl);
             return;
         }
         activity.loadChildFragment(OnlineSearchFragment.newInstance(CombinedSearcher.class, query));

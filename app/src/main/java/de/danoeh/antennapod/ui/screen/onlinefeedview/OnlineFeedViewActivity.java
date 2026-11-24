@@ -30,6 +30,7 @@ import de.danoeh.antennapod.model.download.DownloadRequest;
 import de.danoeh.antennapod.model.download.DownloadResult;
 import de.danoeh.antennapod.model.feed.Feed;
 import de.danoeh.antennapod.net.common.UrlChecker;
+import de.danoeh.antennapod.net.common.youtube.YouTubeFeedUrl;
 import de.danoeh.antennapod.storage.preferences.UserPreferences;
 import de.danoeh.antennapod.ui.preferences.screen.ParentalControlDialog;
 import de.danoeh.antennapod.net.discovery.CombinedSearcher;
@@ -119,7 +120,8 @@ public class OnlineFeedViewActivity extends AppCompatActivity {
                 username = savedInstanceState.getString("username");
                 password = savedInstanceState.getString("password");
             }
-            String preparedUrl = UrlChecker.prepareUrl(feedUrl);
+            String youtubeFeedUrl = YouTubeFeedUrl.fromUserInput(feedUrl);
+            String preparedUrl = UrlChecker.prepareUrl(youtubeFeedUrl != null ? youtubeFeedUrl : feedUrl);
             if (UserPreferences.isParentalControlPasswordSet()
                     && UserPreferences.isParentalControlRequireSubscribeSet()) {
                 ParentalControlDialog.show(this, () -> lookupUrlAndDownload(preparedUrl), this::finish);
