@@ -117,3 +117,18 @@ e cria `FeedMedia(downloadUrl=<URL /v/>, mimeType=audio/*)`. A URL não é mídi
 - `YouTubeFeedUrlTest` (11 testes) passa em `:net:common:test`; `:app:assembleDebug`,
   `checkstyle lint` BUILD SUCCESSFUL.
 - Pendente: verificação e2e no aparelho (aparelho desconectado no momento).
+
+### Verificação e2e no aparelho (duchamp, APK `8a959d7b9`)
+1. **`@handle`:** intent com `https://www.youtube.com/@eslenpodcast` → resolvido via canonical
+   para `channel_id`, casou com a inscrição existente e abriu o feed direto (sem download).
+2. **Playlist:** `playlist?list=PLKxb0YgUkju4gjIIjUN57_jBixiLLK4VI` → log
+   `Requesting download of url https://www.youtube.com/feeds/videos.xml?playlist_id=PL...`,
+   feed baixado, parse OK, prévia com botão "Inscrever-se" (playlist "Special Series -
+   Neurofisiologia").
+3. **`watch?...&list=UU`:** `watch?v=El_Ep1bgO3c&list=UUIHwyJi76D027pbkzct731g` →
+   convertido para `feeds/videos.xml?channel_id=UCIHwyJi76D027pbkzct731g` (visível no
+   "URL do arquivo" de um diálogo de erro) e, numa repetição limpa, abriu o feed já
+   inscrito (feedId 32) direto, sem download.
+- Ocorrências de `Unable to resolve host www.youtube.com` foram transitórias (rede do
+  aparelho); `ping` subsequente OK. Banner vermelho de "última atualização" no feed é
+  resquício dessas falhas de rede, não da conversão.
